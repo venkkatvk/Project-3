@@ -1,6 +1,6 @@
 @Bean
-public ChatClient enterpriseChatClient(ChatClient.Builder builder) {
+public ChatClient enterpriseChatClient(ChatClient.Builder builder, VectorStore redisVectorStore) {
     return builder
-        .defaultAdvisors(new SimpleLoggerAdvisor(), new SecurityPassAdvisor())
+        .defaultAdvisors(new SimpleLoggerAdvisor(), new SecurityPassAdvisor(redisVectorStore))
         .build();
 }
