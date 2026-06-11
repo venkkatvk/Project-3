@@ -1,46 +1,70 @@
-package com.enterprise.ai.gateway.advisor;
+package com.enterprise.ai.gateway;
 
 import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
-import org.springframework.ai.chat.client.advisor.api.ChatClientRequest;
-import org.springframework.ai.chat.client.advisor.api.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
+import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import java.util.List;
+import java.util.Map;
 
 public class SecurityPassAdvisor implements CallAdvisor {
+
     private final VectorStore vectorStore;
 
+    // Injection of the synchronized Redis Vector Store infrastructure component
     public SecurityPassAdvisor(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
     }
 
     @Override
+    public String getName() {
+        return "SecurityPassAdvisor";
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+
+    @Override
     public ChatClientResponse adviseCall(ChatClientRequest request, CallAdvisorChain chain) {
-        // 1. Extract raw query string via fluent API component lookup
-        String userQuery = request.userText();
+        // 1. Traverse the prompt instruction hierarchy to safely extract raw user message string data
+        String userQuery = request.prompt().getInstructions().stream()
+                .filter(msg -> msg instanceof UserMessage)
+                .map(msg -> msg.getContent())
+                .findFirst()
+                .orElse("");
 
-        // 2. Configure proximity limits using cosine similarity parameters
-        SearchRequest searchRequest = SearchRequest.query(userQuery)
-                .withTopK(1)
-                .withSimilarityThreshold(0.75);
+        // 2. Instantiate modern SearchRequest via the canonical version 1.1.7 fluent builder
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query(userQuery)
+                .topK(1)
+                .similarityThreshold(0.75)
+                .build();
 
-        // 3. Query the Redis Stack search registry
+        // 3. Scan the containerized background vector keyspace
         List<Document> cachedMatches = this.vectorStore.similaritySearch(searchRequest);
 
         if (cachedMatches.isEmpty()) {
-            // 📂 Branch A: Cache Miss -> Delegate downstream to next advisor or live LLM model
+            // Cache Miss -> Forward request downstream along the advice interception chain
             return chain.nextCall(request);
         } else {
-            // 🎯 Branch B: Cache Hit -> Short-circuit the request and return the cached text block
+            // Cache Hit -> Short-circuit execution loop and generate a synthetic response wrapper
             Document match = cachedMatches.get(0);
-            ChatResponse cachedChatResponse = new ChatResponse(List.of(new Generation(match.getContent())));
             
+            AssistantMessage assistantMessage = new AssistantMessage(match.getContent(), Map.of());
+            Generation generation = new Generation(assistantMessage);
+            ChatResponse chatResponse = new ChatResponse(List.of(generation));
+
             return ChatClientResponse.builder()
-                    .chatResponse(cachedChatResponse)
+                    .chatResponse(chatResponse)
                     .build();
         }
     }
