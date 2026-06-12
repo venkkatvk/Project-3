@@ -1,25 +1,28 @@
 spring:
+  # 1. Core Framework Overriding Mechanism
+  main:
+    allow-bean-definition-overriding: true
+
   application:
     name: enterprise-ai-gateway
 
-  # 1. Containerized Data Ledger Connection Coordinates
+  # 2. Containerized Data Ledger Connection Coordinates
   data:
     redis:
       host: localhost
       port: 6379
       timeout: 2000ms
 
-  # 2. Spring AI Federated Ecosystem Configurator
+  # 3. Spring AI Federated Ecosystem Configurator
   ai:
     openai:
-      # Safeguarded via environment variable injection with a fallback dummy token for compilation passes
       api-key: ${OPENAI_API_KEY:sk-placeholder-token-for-local-build-validation}
       chat:
         options:
           model: gpt-4o
           temperature: 0.3
 
-    # 3. Intelligent Semantic Index Target Boundaries
+    # 4. Intelligent Semantic Index Target Boundaries
     vectorstore:
       redis:
         index: gateway-semantic-cache
