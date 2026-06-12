@@ -6,7 +6,7 @@ spring:
   application:
     name: enterprise-ai-gateway
 
-  # 2. Relational Metadata Ledger Configuration (Addresses pgvector initialization demands)
+  # 2. Relational Metadata Ledger Configuration (Addresses pgvector auto-configuration requirements)
   datasource:
     url: jdbc:postgresql://localhost:5432/gateway_metadata_vault
     username: enterprise_architect
@@ -26,22 +26,15 @@ spring:
       timeout: 2000ms
 
   # 4. Federated Spring AI Subsystem Configuration Engine
-# Under the Zero-Based Thinking doctrine, keep all previous database configurations intact
-spring:
-  main:
-    allow-bean-definition-overriding: true
-  application:
-    name: enterprise-ai-gateway
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+          temperature: 0.3
 
-ai:
-  openai:
-    # Overwrite the placeholder with your fresh token string below
-    api-key: sk-proj-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
-    chat:
-      options:
-        model: gpt-4o
-        temperature: 0.3
-    # 5. Intelligent Semantic Index Vector Boundaries
+    # 5. Intelligent Semantic Index Target Boundaries
     vectorstore:
       redis:
         index: gateway-semantic-cache
