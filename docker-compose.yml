@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # 1. Specialized Redis Stack Engine (Houses our high-performance semantic cache vector space)
+  gateway-cache-redis:
+    image: redis/redis-stack:latest
+    container_name: gateway_cache_redis
+    ports:
+      - "6379:6379"   # Core database network socket port
+      - "8001:8001"   # Redis Insight graphical analysis dashboard port
+    environment:
+      - REDIS_ARGS=--save 60 1 --loglevel notice
+    volumes:
+      - redis_gateway_data:/data
+    networks:
+      - enterprise_gateway_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # 2. PostgreSQL Vector Storage Engine (Houses long-term production semantic schemas)
+  gateway-vector-postgres:
+    image: pgvector/pgvector:pg16
+    container_name: gateway_vector_postgres
+    ports:
+      - "5432:5442"   # Mapped safely to avoid any local port clashes
+    environment:
+      - POSTGRES_USER=enterprise_architect
+      - POSTGRES_PASSWORD=sacred_vault_password_2026
+      - POSTGRES_DB=gateway_metadata_vault
+    volumes:
+      - postgres_gateway_data:/var/lib/postgresql/data
+    networks:
+      - enterprise_gateway_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U enterprise_architect -d gateway_metadata_vault"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis_gateway_data:
+    driver: local
+  postgres_gateway_data:
+    driver: local
+
+networks:
+  enterprise_gateway_network:
+    driver: bridge
