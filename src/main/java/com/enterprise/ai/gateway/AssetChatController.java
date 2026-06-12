@@ -1,4 +1,4 @@
-package com.enterprise.ai.gateway.controller;
+package com.enterprise.ai.gateway;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,14 +10,14 @@ public class AssetChatController {
 
     private final ChatClient chatClient;
 
-    // Dependency Injection: Spring automatically hands the global robot guard bean to our mailbox!
+    // Dependency Injection: Spring automatically hands our custom configured ChatClient bean to this mailbox
     public AssetChatController(ChatClient enterpriseChatClient) {
         this.chatClient = enterpriseChatClient;
     }
 
     @GetMapping("/api/v1/chat")
     public String initiateSecureChat(@RequestParam(value = "prompt") String prompt) {
-        // Hand the prompt to the robot guard and wait for the filtered response payload
+        // Direct execution routing: passes prompt down the advisor chain through the virtual guard
         return this.chatClient.prompt()
                 .user(prompt)
                 .call()

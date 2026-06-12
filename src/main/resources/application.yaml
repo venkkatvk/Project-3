@@ -1,38 +1,27 @@
-server:
-  port: 8080
-  tomcat:
-    threads:
-      max: 200 # Standard configuration, but we will leverage Virtual Threads for low-latency scaling
-
 spring:
   application:
     name: enterprise-ai-gateway
 
-  # 1. Relational & High-Dimension Persistence Configuration
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: your_secret_db_password
-    driver-class-name: org.postgresql.Driver
+  # 1. Containerized Data Ledger Connection Coordinates
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
 
-  # 2. Vector Store Custom Configuration (Mapping to pgvector metadata patterns)
+  # 2. Spring AI Federated Ecosystem Configurator
   ai:
-    vectorstore:
-      pgvector:
-        dimension: 4 # Matching the 4D workspace we deployed on pgAdmin
-        distance-type: COSINE
-        initialize-schema: true
-
-    # 3. Fast Cache & Semantic Caching Layer (Redis Stack Mapping)
-    data:
-      redis:
-        host: localhost
-        port: 6379
-
-    # 4. Global Core LLM Model Integration Configuration
     openai:
-      api-key: ${OPENAI_API_KEY:mock-key-for-local-dev}
+      # Safeguarded via environment variable injection with a fallback dummy token for compilation passes
+      api-key: ${OPENAI_API_KEY:sk-placeholder-token-for-local-build-validation}
       chat:
         options:
-          model: gpt-5-mini # Modern 2026 cost-effective default tier
+          model: gpt-4o
           temperature: 0.3
+
+    # 3. Intelligent Semantic Index Target Boundaries
+    vectorstore:
+      redis:
+        index: gateway-semantic-cache
+        prefix: "ai:gateway:"
+        initialize-schema: true
