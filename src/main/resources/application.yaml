@@ -1,28 +1,47 @@
 spring:
-  # 1. Core Framework Overriding Mechanism
+  # 1. Framework Component Processing Directives
   main:
     allow-bean-definition-overriding: true
 
   application:
     name: enterprise-ai-gateway
 
-  # 2. Containerized Data Ledger Connection Coordinates
+  # 2. Relational Metadata Ledger Configuration (Addresses pgvector initialization demands)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gateway_metadata_vault
+    username: enterprise_architect
+    password: sacred_vault_password_2026
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+  # 3. High-Performance Containerized Cache Connection Coordinates
   data:
     redis:
       host: localhost
       port: 6379
       timeout: 2000ms
 
-  # 3. Spring AI Federated Ecosystem Configurator
-  ai:
-    openai:
-      api-key: ${OPENAI_API_KEY:sk-placeholder-token-for-local-build-validation}
-      chat:
-        options:
-          model: gpt-4o
-          temperature: 0.3
+  # 4. Federated Spring AI Subsystem Configuration Engine
+# Under the Zero-Based Thinking doctrine, keep all previous database configurations intact
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: enterprise-ai-gateway
 
-    # 4. Intelligent Semantic Index Target Boundaries
+ai:
+  openai:
+    # Overwrite the placeholder with your fresh token string below
+    api-key: sk-proj-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
+    chat:
+      options:
+        model: gpt-4o
+        temperature: 0.3
+    # 5. Intelligent Semantic Index Vector Boundaries
     vectorstore:
       redis:
         index: gateway-semantic-cache
