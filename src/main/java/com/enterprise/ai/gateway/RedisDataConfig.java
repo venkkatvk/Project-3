@@ -14,13 +14,12 @@ import redis.clients.jedis.JedisPooled;
 public class RedisDataConfig {
 
     @Bean
-    public RedisVectorStore vectorStore(EmbeddingModel embeddingModel) {
-        // Initializes the pooled connection to the Redis infrastructure
-        JedisPooled jedisPooled = new JedisPooled("localhost", 6379);
-        
-        return RedisVectorStore.builder(jedisPooled, embeddingModel)
-                .indexName("healthcare_360_index")
-                .prefix("patient_data:")
-                .build();
+public RedisVectorStore vectorStore(EmbeddingModel embeddingModel) {
+    JedisPooled jedisPooled = new JedisPooled("localhost", 6379);
+    // Modernized builder call
+    return RedisVectorStore.builder(jedisPooled, embeddingModel)
+            .indexName("healthcare_360_index")
+            .build();
+}
     }
 }
