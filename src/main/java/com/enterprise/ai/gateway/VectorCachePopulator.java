@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-@Component
+// Temporarily deactivated to bypass remote cloud provider 429 quota blockades
+// @Component
 public class VectorCachePopulator implements CommandLineRunner {
 
     private final VectorStore vectorStore;
