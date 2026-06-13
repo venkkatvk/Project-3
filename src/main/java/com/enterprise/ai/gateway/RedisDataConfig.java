@@ -2,7 +2,7 @@ package com.enterprise.ai.gateway;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.ai.vectorstore.RedisVectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.ai.embedding.EmbeddingModel;
 import redis.clients.jedis.JedisPooled;
 
