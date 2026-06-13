@@ -1,0 +1,42 @@
+spring:
+  # 1. Framework Component Processing Directives
+  main:
+    allow-bean-definition-overriding: true
+
+  application:
+    name: enterprise-ai-gateway
+
+  # 2. Relational Metadata Ledger Configuration (Addresses pgvector auto-configuration requirements)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gateway_metadata_vault
+    username: enterprise_architect
+    password: sacred_vault_password_2026
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+  # 3. High-Performance Containerized Cache Connection Coordinates
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
+  # 4. Federated Spring AI Subsystem Configuration Engine
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+          temperature: 0.3
+
+    # 5. Intelligent Semantic Index Target Boundaries
+    vectorstore:
+      redis:
+        index: gateway-semantic-cache
+        prefix: "ai:gateway:"
+        initialize-schema: true
