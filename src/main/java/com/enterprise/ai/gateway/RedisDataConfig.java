@@ -10,16 +10,14 @@ import redis.clients.jedis.JedisPooled;
  * Isolated Bounded Context: Persistence Layer Integration
  * Binds the gateway to a persistent Redis vector storage engine.
  */
-@Configuration
+ @Configuration
 public class RedisDataConfig {
 
     @Bean
-public RedisVectorStore vectorStore(EmbeddingModel embeddingModel) {
-    JedisPooled jedisPooled = new JedisPooled("localhost", 6379);
-    // Modernized builder call
-    return RedisVectorStore.builder(jedisPooled, embeddingModel)
-            .indexName("healthcare_360_index")
-            .build();
-}
+    public RedisVectorStore vectorStore(EmbeddingModel embeddingModel) {
+        JedisPooled jedisPooled = new JedisPooled("localhost", 6379);
+        return RedisVectorStore.builder(jedisPooled, embeddingModel)
+                .indexName("healthcare_360_index")
+                .build();
     }
-}
+} // <--- THIS FINAL BRACE IS LIKELY MISSING IN YOUR FILE   
