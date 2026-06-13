@@ -21,7 +21,7 @@ public class DataIngestionService {
 
     public void ingestHealthcareData(String rawText) {
         // Step 1: Fragment the text into semantically dense chunks
-        TokenTextSplitter splitter = new TokenTextSplitter(500, 50, 5, 1000, true);
+        TokenTextSplitter splitter = new TokenTextSplitter();
         List<Document> documents = splitter.apply(List.of(new Document(rawText)));
 
         // Step 2: Generate embeddings and persist into Redis
