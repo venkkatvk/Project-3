@@ -1,3 +1,4 @@
+com\enterprise\ai\gateway\RedisDataConfig$1.class
 com\enterprise\ai\gateway\VectorCachePopulator.class
 com\enterprise\ai\gateway\SecurityPassAdvisor.class
 com\enterprise\ai\gateway\AssetChatController.class
