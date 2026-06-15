@@ -7,8 +7,14 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ObservabilityConfig {
+
     @Bean
-    ObservedAspect observedAspect(ObservationRegistry observationRegistry) {
+    public ObservationRegistry observationRegistry() {
+        return ObservationRegistry.create();
+    }
+
+    @Bean
+    public ObservedAspect observedAspect(ObservationRegistry observationRegistry) {
         return new ObservedAspect(observationRegistry);
     }
 }
