@@ -8,9 +8,11 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingRequest;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.ai.embedding.Embedding;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore.Builder;
+
 import redis.clients.jedis.JedisPooled;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
@@ -48,11 +50,17 @@ public class RedisDataConfig {
     }
 
     @Bean
+    @Primary
     @Lazy
-    public RedisVectorStore vectorStore(JedisPooled jedisPooled, EmbeddingModel embeddingModel) {
-        return RedisVectorStore.builder(jedisPooled, embeddingModel)
-                .indexName("healthcare_360_index")
+    public VectorStore vectorStore(JedisPooled jedisPooled, EmbeddingModel embeddingModel) {
+          return RedisVectorStore.builder(jedisPooled, embeddingModel)
+                    .indexName("healthcare_360_index")
                 .build();
+    }
+
+    private Builder indexName(String string) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'indexName'");
     }
 
     @Bean

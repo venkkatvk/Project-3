@@ -48,3 +48,8 @@ management:
     otlp:
       tracing:
         endpoint: http://localhost:4317
+
+        spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreAutoConfiguration
