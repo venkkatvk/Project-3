@@ -7,30 +7,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Enterprise Bounded Context: Conversational Ingress Gateway Layer
- * Exposes securely isolated, stateful REST API endpoints for user request interceptors.
+ * Handles incoming JSON-wrapped payload strings over secured HTTP POST channels.
  */
 @RestController
 public class AssetChatController {
 
     private final ChatClient chatClient;
 
-    // Dependency Injection: Spring automatically wires our context-aware, advisor-augmented ChatClient
+    /**
+     * Dependency Injection: The Spring IoC container automatically injects
+     * our custom-configured, advisor-augmented ChatClient bean instance.
+     */
     public AssetChatController(ChatClient enterpriseChatClient) {
         this.chatClient = enterpriseChatClient;
     }
 
     /**
-     * Data Transfer Object (DTO) Record
-     * Encapsulates the inbound JSON serialization matrix frame cleanly.
+     * Data Transfer Object (DTO) Record Definition
+     * Maps the incoming JSON serialization schema keys cleanly to the heap space.
      */
     public record ChatRequest(String message) {}
 
     /**
      * Intercepts incoming POST data payloads to route inquiries past our security advisors.
+     * Maps perfectly to incoming JSON keys matching the 'message' format matrix.
      */
     @PostMapping("/api/v1/chat")
     public String initiateSecureChat(@RequestBody ChatRequest request) {
-        // Direct execution routing: extracts the unboxed text token from our payload record frame
+        // Direct execution routing: extracts the raw text token string from the deserialized DTO frame
         return this.chatClient.prompt()
                 .user(request.message())
                 .call()
