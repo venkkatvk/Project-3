@@ -8,6 +8,8 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingRequest;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.ai.embedding.Embedding;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import redis.clients.jedis.JedisPooled;
 import java.util.List;
@@ -50,5 +52,16 @@ public class RedisDataConfig {
         return RedisVectorStore.builder(jedisPooled, embeddingModel)
                 .indexName("healthcare_360_index")
                 .build();
+    }
+    // Add this import
+    /**
+     * @param jedisPooled
+     * @param embeddingModel
+     * @return
+     */
+    @Bean
+    @Lazy // This prevents the startup connection error
+    public VectorStore vectorStore(JedisPooled jedisPooled, EmbeddingModel embeddingModel) {
+        return new RedisVectorStore(jedisPooled, embeddingModel);
     }
 }

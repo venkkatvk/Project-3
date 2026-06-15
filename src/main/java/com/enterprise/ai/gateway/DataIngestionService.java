@@ -2,7 +2,9 @@ package com.enterprise.ai.gateway;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -17,6 +19,10 @@ public class DataIngestionService {
 
     public DataIngestionService(RedisVectorStore vectorStore) {
         this.vectorStore = vectorStore;
+    }
+
+    public DataIngestionService(@Lazy VectorStore vectorStore) {
+        this.vectorStore = (RedisVectorStore) vectorStore;
     }
 
     public void ingestHealthcareData(String rawText) {

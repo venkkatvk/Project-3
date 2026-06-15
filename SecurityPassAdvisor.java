@@ -9,6 +9,8 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,8 +18,28 @@ import java.util.stream.Collectors;
  * Enterprise Bounded Context: Interception and Retrieval Augmentation Subsystem
  * Implements the official Spring AI CallAdvisor specification for real-time RAG injections.
  */
+
 @Component
 public class SecurityPassAdvisor implements CallAdvisor {
+
+    // Apply the breaker to your retrieval logic
+@Override
+@CircuitBreaker(name = "vectorStore", fallbackMethod = "fallbackSimilaritySearch")
+public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
+    String userQuery = chatClientRequest.prompt().getContents();
+    
+    // Logic delegated to a dedicated method for the breaker to wrap
+    List<Document> similarDocuments = performResilientSearch(userQuery);
+    
+    // ... rest of your existing logic ...
+    return callAdvisorChain.nextCall(augmentedRequest);
+}
+
+// Fallback logic - This is what happens when the circuit is OPEN
+public List<Document> fallbackSimilaritySearch(String query, Throwable t) {
+    System.err.println("Circuit Breaker OPEN: Redis unavailable, using empty context. Reason: " + t.getMessage());
+    return Collections.emptyList(); // Graceful degradation
+}
 
     // Abstracted to interface layout level to ensure loose coupling and universal bean resolution
     private final VectorStore vectorStore;
@@ -70,5 +92,16 @@ public class SecurityPassAdvisor implements CallAdvisor {
 
         // Step 6: Advance execution downstream to the next advisor chain unit
         return callAdvisorChain.nextCall(augmentedRequest);
+
+        @CircuitBreaker(name = "vectorStore", fallbackMethod = "fallbackSimilaritySearch")
+        final List<Document> executeResilientSearch(String query) {
+        return vectorStore.similaritySearch(SearchRequest.builder().query(query).build());
+}
+
+// Fallback method returns an empty list if Redis is down
+        final List<Document> fallbackSimilaritySearch(String fallbackQuery, Throwable t) {
+        System.err.println("Redis unavailable! Executing fallback: " + t.getMessage());
+        return List.of(); 
+}
     }
 }
