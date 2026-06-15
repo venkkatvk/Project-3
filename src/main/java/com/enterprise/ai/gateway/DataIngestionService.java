@@ -15,14 +15,10 @@ import java.util.List;
 @Service
 public class DataIngestionService {
 
-    private final RedisVectorStore vectorStore;
-
-    public DataIngestionService(RedisVectorStore vectorStore) {
-        this.vectorStore = vectorStore;
-    }
+    private final VectorStore vectorStore;
 
     public DataIngestionService(@Lazy VectorStore vectorStore) {
-        this.vectorStore = (RedisVectorStore) vectorStore;
+        this.vectorStore = vectorStore;
     }
 
     public void ingestHealthcareData(String rawText) {

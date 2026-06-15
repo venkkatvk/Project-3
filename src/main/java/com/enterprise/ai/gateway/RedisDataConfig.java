@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import redis.clients.jedis.JedisPooled;
+import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 
 /**
@@ -47,21 +48,16 @@ public class RedisDataConfig {
     }
 
     @Bean
-    public RedisVectorStore vectorStore(EmbeddingModel embeddingModel) {
-        JedisPooled jedisPooled = new JedisPooled("localhost", 6379);
+    @Lazy
+    public RedisVectorStore vectorStore(JedisPooled jedisPooled, EmbeddingModel embeddingModel) {
         return RedisVectorStore.builder(jedisPooled, embeddingModel)
                 .indexName("healthcare_360_index")
                 .build();
     }
-    // Add this import
-    /**
-     * @param jedisPooled
-     * @param embeddingModel
-     * @return
-     */
+
     @Bean
-    @Lazy // This prevents the startup connection error
-    public VectorStore vectorStore(JedisPooled jedisPooled, EmbeddingModel embeddingModel) {
-        return new RedisVectorStore(jedisPooled, embeddingModel);
+    public JedisPooled jedisPooled(@Value("${spring.data.redis.host:localhost}") String host, 
+                                   @Value("${spring.data.redis.port:6379}") int port) {
+        return new JedisPooled(host, port);
     }
 }

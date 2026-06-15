@@ -7,6 +7,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Service Configuration Layer Bounded Context
@@ -22,6 +23,7 @@ public class AiGatewayConfig {
     }
 
     @Bean
+    @Lazy
     public ChatClient enterpriseChatClient(ChatModel chatModel, VectorStore vectorStore) {
         return ChatClient.builder(chatModel)
                 .defaultAdvisors(new SecurityPassAdvisor(vectorStore))
