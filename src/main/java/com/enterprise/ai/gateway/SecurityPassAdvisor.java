@@ -9,8 +9,10 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+import io.micrometer.observation.annotation.Observed;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 /**
  * Enterprise Bounded Context: Interception and Retrieval Augmentation Subsystem
@@ -30,6 +32,12 @@ public class SecurityPassAdvisor implements CallAdvisor {
     public String getName() {
         return "SecurityPassAdvisor";
     }
+ 
+    @Override
+        @Observed(name = "rag.retrieval.latency", contextualName = "vector-store-search")
+        public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
+    
+}
 
     @Override
     public int getOrder() {
@@ -70,5 +78,8 @@ public class SecurityPassAdvisor implements CallAdvisor {
 
         // Step 6: Advance execution downstream to the next advisor chain unit
         return callAdvisorChain.nextCall(augmentedRequest);
+
+
+        
     }
 }

@@ -40,3 +40,12 @@ spring:
         index: gateway-semantic-cache
         prefix: "ai:gateway:"
         initialize-schema: true
+     
+     
+   management:
+      tracing:
+        sampling:
+      probability: 1.0 # 100% trace capture for diagnostic mode
+     otlp:
+          tracing:
+          endpoint: http://localhost:4317 # Standard OTLP collector port  
