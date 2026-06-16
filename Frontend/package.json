@@ -1,7 +1,3 @@
-// Subsystem Name: Frontend Provisioning Layer
-// Configuration Context: Client Workspace Lifecycle Manifest
-// File Location: frontend/package.json
-
 {
   "name": "healthcare-360-gateway-ui",
   "private": true,
