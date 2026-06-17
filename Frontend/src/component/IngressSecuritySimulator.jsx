@@ -1,6 +1,6 @@
 // Subsystem Name: Aesthetic Ingress Control Layer
 // Technology Stack: React / Tailwind Engine Framework
-// File Location: Frontend/src/component/IngressSecuritySimulator.js
+// File Location: Frontend/src/component/IngressSecuritySimulator.jsx
 
 import React, { useState } from 'react';
 
