@@ -48,8 +48,14 @@ management:
     otlp:
       tracing:
         endpoint: http://localhost:4317
-
-        spring:
+        
+      spring:
+  application:
+    name: enterprise-ai-gateway
+  ai:
+    openai:
+      api-key: mock-key-for-local-threads
   autoconfigure:
     exclude:
       - org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreAutoConfiguration
+      - org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration
