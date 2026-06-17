@@ -3,16 +3,17 @@ package com.enterprise.ai.gateway;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 /**
  * Isolated Bounded Context: Stateless Boundary Security Subsystem
  * Decoupled interceptor filter processing incoming cryptographic authentication headers.
  */
+@Component
 public class EnterpriseSecurityFilter implements Filter {
 
-    // Simulating an enterprise HMAC signing key token parameter for validation passes
-    private static final String SACRED_GATEWAY_TOKEN = "Bearer secret-virtual-thread-token-2026";
+    private static final String EXPECTED_TOKEN = "secret-virtual-thread-token-2026";
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -20,19 +21,27 @@ public class EnterpriseSecurityFilter implements Filter {
         
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+        
+        // CRITICAL FIX: Explicitly bypass the security check for HTTP OPTIONS preflight handshake
+        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+            httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+            httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+            httpResponse.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+            httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+            return; // Terminate filter evaluation early for safe preflight clearance
+        }
 
+        // Perimeter Auth Logic for standard data transactions (POST/GET)
         String authHeader = httpRequest.getHeader("Authorization");
-
-        // Cryptographic Perimeter Assertion Loop
-        if (authHeader == null || !authHeader.equals(SACRED_GATEWAY_TOKEN)) {
-            // Short-circuiting the request thread line before it reaches inner business controllers
+        if (authHeader == null || !authHeader.equals("Bearer " + EXPECTED_TOKEN)) {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResponse.setContentType("application/json");
-            httpResponse.getWriter().write("{\"security_error\": \"Missing or invalid cryptographic signature token pass.\"}");
+            httpResponse.getWriter().write("{\"error\": \"EDGE REJECTION: Invalid Perimeter Token\"}");
             return;
         }
 
-        // Token signature verified cleanly. Advance the execution handle down the filter chain pipeline.
+        // Handing off transaction focus to downstream endpoints if credential checks clear
         chain.doFilter(request, response);
     }
 }

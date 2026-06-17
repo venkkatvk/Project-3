@@ -1,5 +1,5 @@
-// Subsystem Name: Network Boundary & CORS Configuration Layer
-// Domain Context: Ingress Boundary Control Group
+// Subsystem Name: Cross-Origin Resource Gateway Layer
+// Domain Context: Boundary Security Infrastructure Group
 // File Location: src/main/java/com/enterprise/ai/gateway/CorsConfig.java
 
 package com.enterprise.ai.gateway;
@@ -9,27 +9,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+import java.util.List;
 
 @Configuration
 public class CorsConfig {
 
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE) // CRITICAL: Execute before EnterpriseSecurityFilter checks for tokens
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         
-        // Allow recruiters to easily pass data across origin spaces
+        // Explicitly welcoming your Vite development browser workspace origin
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*"); // Supports wildcard handshakes for cross-origin local viewports
-        config.addAllowedHeader("*");        // Accepts any custom client authorization strings
-        config.addAllowedMethod("*");        // Grants access for GET, POST, and preflight OPTIONS packets
         
-        // Bind the passport treaty rules strictly to our AI API context paths
+        // Binding this security passport template across all incoming API corridors
         source.registerCorsConfiguration("/api/v1/**", config);
-        
         return new CorsFilter(source);
     }
 }

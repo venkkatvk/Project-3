@@ -1,3 +1,7 @@
+# Subsystem Name: Declarative Infrastructure Configuration Layer
+# Domain Context: Environmental Environment Properties Group
+# File Location: src/main/resources/application.yaml
+
 spring:
   # 1. Framework Component Processing Directives
   main:
@@ -40,6 +44,22 @@ spring:
         index: gateway-semantic-cache
         prefix: "ai:gateway:"
         initialize-schema: true
+
+# Explicitly anchoring the behavioral thresholds for the llmPerimeterShield instance
+resilience4j:
+  circuitbreaker:
+    instances:
+      llmPerimeterShield:
+        # Enforcing a sliding validation window based on transaction item counts
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        # If 50% of the last 10 requests collapse, trip the drawbridge to the OPEN state
+        failureRateThreshold: 50
+        # Wait 10000ms (10 seconds) in OPEN state before testing with HALF_OPEN scouts
+        waitDurationInOpenState: 10000ms
+        permittedNumberOfCallsInHalfOpenState: 3
+        # Automatically capture execution context state-changes for debugging pools
+        automaticTransitionFromOpenToHalfOpenEnabled: true
 
 management:
   tracing:

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // CORRECTED: Pointing precisely to your singular component folder and file on disk
-import IngressSecuritySimulator from './component/IngressSecuritySimulator.js';
+import IngressSecuritySimulator from './component/IngressSecuritySimulator.jsx';
 
 export default function App() {
   const [gatewayMetrics, setGatewayMetrics] = useState(null);
