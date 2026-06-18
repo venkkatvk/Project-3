@@ -1,0 +1,33 @@
+🛠 Prerequisites
+Ensure the following are installed on your local machine:
+Java 21 (Required for Virtual Threads support).
+Docker Desktop (To run the infrastructure stack).
+Node.js & npm (For the Frontend dashboard).
+Maven (For backend dependency management).
+🏗 Setup Instructions
+1. Infrastructure Orchestration
+Spin up the required database and caching engines using the provided Docker configuration.
+# From the project root
+docker-compose up -d
+This will initialize:
+PostgreSQL (Port 5432)
+Redis Stack (Port 6379 & 8001 for RedisInsight)
+2. Vector Engine Initialization
+The system requires the pgvector extension to handle multidimensional embeddings.
+For Windows Users (Manual Build): If you are not using the Docker-preconfigured vector image, you must build pgvector manually:
+Open x64 Native Tools Command Prompt as Administrator.
+Navigate to the pgvector/ directory
+.
+Run nmake /f Makefile.win and nmake /f Makefile.win install.
+In your SQL client (e.g., pgAdmin), execute:
+3. Backend Configuration
+Update your src/main/resources/application.yml with your LLM provider credentials (e.g., OpenAI, Anthropic) and ensure the datasource points to the Docker-provisioned Postgres instance.
+Build and Run:
+mvn clean install
+mvn spring-boot:run
+4. Frontend Deployment
+The dashboard provides a real-time view of the gateway's performance
+.
+cd Frontend
+npm install
+npm run dev
