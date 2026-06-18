@@ -1,0 +1,11 @@
+### Test Case A: Automated Cache Hit Validation
+### Expected Behavior: Near-zero latency response served directly from the Redis Vector Store index.
+GET http://localhost:8080/api/v1/chat?prompt=The%20secure%20portal%20to%20the%20Enterprise%20Architecture%20is%20strictly%20guarded%20by%20Virtual%20Threads.
+Accept: application/json
+
+### ====================================================================
+
+### Test Case B: Automated Cache Miss & Live Routing Validation
+### Expected Behavior: Cache bypass. Request is routed downstream to the live OpenAI model context.
+GET http://localhost:8080/api/v1/chat?prompt=Explain%20how%20photosynthesis%20works%20in%20deep%20sea%20algae.
+Accept: application/json

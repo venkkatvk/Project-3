@@ -1,0 +1,67 @@
+# Subsystem Name: Declarative Infrastructure Configuration Layer
+# File Location: src/main/resources/application.yaml
+
+server:
+  port: 8081
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  application:
+    name: enterprise-ai-gateway
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gateway_metadata_vault
+    username: enterprise_architect
+    password: sacred_vault_password_2026
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:mock-key-for-local-threads}
+      chat:
+        options:
+          model: gpt-4o
+          temperature: 0.3
+
+    vectorstore:
+      redis:
+        index: healthcare_360_index_v2
+        prefix: "ai:gateway:"
+        initialize-schema: true
+
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreAutoConfiguration
+      - org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      llmPerimeterShield:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000ms
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    otlp:
+      tracing:
+        endpoint: http://localhost:4317
