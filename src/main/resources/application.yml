@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: ai-gateway-platform
+
+  # OpenAI Configuration (Required for embeddings)
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+
+    # Vector Store Configuration
+    vectorstore:
+      # pgvector Configuration
+      pgvector:
+        table-name: vector_store
+        index-type: HNSW
+        distance-type: COSINE
+        dimensions: 1536 # Default for OpenAI text-embedding-3-small
+
+      # Redis Configuration
+      redis:
+        uri: redis://localhost:6379
+        index: spring-ai-index
+        prefix: "ai:"
+
+  # PostgreSQL DataSource (Required for pgvector)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
