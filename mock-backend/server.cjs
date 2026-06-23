@@ -2,13 +2,27 @@ const http = require('http');
 
 const PORT = 8080;
 
-const mockResponses = [
-  "Based on your medical records, I've identified 3 active blood pressure medications: Lisinopril 10mg (daily), Amlodipine 5mg (daily), and Hydrochlorothiazide 25mg (daily). Your last BP reading on file was 128/82 mmHg — within acceptable range. Recommend scheduling a follow-up in 30 days.",
-  "Vector cache HIT (semantic similarity: 0.94). Retrieving cached clinical response for hypertension profile query. Patient record last updated: 2026-06-01. Embedding model: text-embedding-3-small. Response latency: 12ms.",
-  "AI Gateway processing complete. Semantic routing applied. No PHI exposure detected. Security filter: PASSED. Cache layer: MISS — generating new embedding. OpenAI API call dispatched on Virtual Thread pool.",
-  "Clinical decision support engaged. Risk stratification: LOW. Medication adherence score: 87%. Suggested intervention: Continue current regimen. Next lab panel recommended: Comprehensive Metabolic Panel in 90 days.",
-  "Perimeter security PASSED. Enterprise token validated. Ingress pipeline nominal. Processing clinical query through RAG pipeline — 4 relevant document chunks retrieved from pgvector store.",
-];
+function generateResponse(message) {
+  const msg = message.toLowerCase();
+
+  if (msg.includes('blood pressure') || msg.includes('hypertension') || msg.includes('medication')) {
+    return "Patient has 3 active antihypertensive medications on file: Lisinopril 10mg (once daily), Amlodipine 5mg (once daily), and Hydrochlorothiazide 25mg (once daily). Most recent BP reading: 128/82 mmHg. Adherence score: 87%. Recommend follow-up in 30 days and a Comprehensive Metabolic Panel in 90 days.";
+  }
+  if (msg.includes('medical record') || msg.includes('history')) {
+    return "Medical record summary retrieved. Patient has 4 active diagnoses: Stage 1 Hypertension, Type 2 Diabetes (controlled), Hyperlipidemia, and Mild Osteoarthritis. Last visit: 2026-05-14. No outstanding referrals. Next scheduled appointment: 2026-07-02.";
+  }
+  if (msg.includes('lab') || msg.includes('test') || msg.includes('result')) {
+    return "Most recent lab results (2026-06-01): HbA1c 6.8% (target <7%), LDL 98 mg/dL (target <100mg/dL), eGFR 72 mL/min/1.73m² (normal range), Potassium 4.1 mEq/L (normal). All values within therapeutic targets. No immediate clinical action required.";
+  }
+  if (msg.includes('diagnos') || msg.includes('condition')) {
+    return "Active conditions: Hypertension (ICD-10: I10), Type 2 Diabetes Mellitus (E11.9), Hyperlipidemia (E78.5). Risk stratification: MODERATE. Preventive care gap: Pneumococcal vaccine due, colorectal screening overdue by 6 months.";
+  }
+  if (msg.includes('allerg')) {
+    return "Known allergies on file: Penicillin (reaction: rash, severity: moderate), Sulfa drugs (reaction: anaphylaxis, severity: severe). No food allergies documented. Last allergy review: 2026-01-20.";
+  }
+
+  return `Query processed. Based on available clinical data, the following assessment was generated for: "${message.substring(0, 60)}${message.length > 60 ? '...' : ''}". No contraindications detected. Security perimeter cleared. All PHI access logged under audit trail ID #${Math.floor(Math.random() * 90000) + 10000}.`;
+}
 
 let requestCount = 0;
 
@@ -45,16 +59,21 @@ const server = http.createServer((req, res) => {
       try {
         const parsed = JSON.parse(body);
         const message = parsed.message || '';
-        console.log(`[GATEWAY] Processing: "${message.substring(0, 60)}..."`);
+        console.log(`[GATEWAY] Processing: "${message.substring(0, 60)}"`);
 
-        const simulatedLatency = Math.floor(Math.random() * 60) + 15;
-        const response = mockResponses[requestCount % mockResponses.length];
+        const delay = Math.floor(Math.random() * 60) + 15;
         requestCount++;
 
         setTimeout(() => {
-          res.writeHead(200, { 'Content-Type': 'text/plain' });
-          res.end(`[AI GATEWAY RESPONSE]\n\n${response}\n\n---\nModel: gpt-4o | Tokens: ${Math.floor(Math.random() * 300) + 100} | Cache: ${Math.random() > 0.5 ? 'HIT' : 'MISS'} | Latency: ${simulatedLatency}ms`);
-        }, simulatedLatency);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            answer: generateResponse(message),
+            model: 'gpt-4o',
+            tokens: Math.floor(Math.random() * 200) + 80,
+            cacheStatus: Math.random() > 0.5 ? 'HIT' : 'MISS',
+            requestId: `req_${Date.now()}`,
+          }));
+        }, delay);
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'BAD_REQUEST', message: 'Invalid JSON body.' }));
@@ -75,7 +94,4 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, 'localhost', () => {
   console.log(`AI Gateway Mock Backend running on http://localhost:${PORT}`);
-  console.log('Endpoints:');
-  console.log(`  POST /api/v1/chat  — AI gateway chat endpoint`);
-  console.log(`  GET  /health       — Health check`);
 });
