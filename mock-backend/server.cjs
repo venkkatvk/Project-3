@@ -47,7 +47,7 @@ const server = http.createServer((req, res) => {
         const message = parsed.message || '';
         console.log(`[GATEWAY] Processing: "${message.substring(0, 60)}..."`);
 
-        const simulatedLatency = Math.floor(Math.random() * 180) + 20;
+        const simulatedLatency = Math.floor(Math.random() * 60) + 15;
         const response = mockResponses[requestCount % mockResponses.length];
         requestCount++;
 
