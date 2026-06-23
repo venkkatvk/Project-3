@@ -11,9 +11,9 @@ export default function App() {
     const timestamp = new Date().toLocaleTimeString();
     
     try {
-      setLiveTerminalLogs(prev => [`[${timestamp}] 📡 Dispatching virtual thread payload to port 8081...`, ...prev]);
+      setLiveTerminalLogs(prev => [`[${timestamp}] 📡 Dispatching virtual thread payload to gateway...`, ...prev]);
       
-      const response = await fetch("http://localhost:8081/api/v1/chat", {
+      const response = await fetch("/api/v1/chat", {
         method: "POST",
         headers: packagedPayload.headers,
         body: JSON.stringify(packagedPayload.body)
